@@ -1,57 +1,54 @@
 # NovaSys mobile
 
-One Flutter Android app for Parent and Driver users. The authentication UI follows
-`design_reference/parent/P01`, `P02`, `P02B`, and `P02C` (the four supplied SVGs).
-These files were copied from Downloads because the local parent reference folder was absent.
-All screens, controls, and the welcome illustration are Flutter widgets/CustomPaint;
-the full-screen reference SVGs are not bundled or displayed in the app.
+One Flutter Android application for Parent and Driver users, with simulated authentication.
+The primary visual references are the five screenshots in `design_reference/auth_screenshots/`.
+Individual elements from `design_reference/auth_latest/` supply the decorative bus scene and
+Google mark. Screens and controls are Flutter widgets, not screenshot backgrounds.
 
-## Run and demo flow
+## Navigation
+
+- App launch: Splash (1.4 seconds) → Initial.
+- Create an Account: Initial → Welcome / Language → Parent or Driver selection → Mobile number → OTP → Registration → selected-role dashboard placeholder.
+- Sign In: Initial → Mobile number → OTP → stored-role dashboard for existing accounts.
+- A new number entered through Sign In selects a role after OTP, then registers.
+- Back and Change preserve the working flow. Existing dashboard placeholders and their sign-out behavior are unchanged.
+
+## Local demo
+
+- Parent: `77 123 4567`; Driver: `77 234 5678`.
+- Any other valid Sri Lankan mobile number starts new-user registration.
+- Any six digits verify a requested mock OTP. Resend is available after 30 seconds;
+  challenges expire after five minutes and cannot be verified twice.
+- Registration requires a name and consent. Email and sample profile avatar are optional.
+- Google opens an explicitly simulated account selector. Profile photo uses a sample avatar.
+- Accounts exist only for this app session. Language preference is retained in memory;
+  full Sinhala/Tamil interface translations are not included.
+- No Firebase, SMS, OAuth, backend APIs, GPS, or payment processing is connected.
+
+## Structure
+
+`lib/models/`, `lib/views/`, `lib/controllers/`, and `lib/repositories/` preserve MVC separation.
+`lib/theme/auth_theme.dart` scopes the updated appearance to authentication.
+The global theme and dashboard implementations are preserved.
+
+## Run and checks
 
 ```sh
-flutter pub get
 flutter run
-```
-
-Welcome / language selection → mobile number → verification → existing role dashboard
-or new-user registration. Registration includes name, optional email, sample avatar,
-Parent/Driver selection, and required consent. Back/Change returns to the mobile form.
-
-- Parent demo: `77 123 4567`.
-- Driver demo: `77 234 5678`.
-- Any other valid Sri Lankan mobile number starts registration.
-- Enter any **six digits** for the simulated OTP. Codes expire after five minutes;
-  resend is available after 30 seconds. A code cannot be verified twice.
-- OTP shortcuts open a new account flow or an existing Parent/Driver sample account.
-- Continue with Google opens an explicitly simulated account selector, not OAuth.
-- Profile photo offers a sample avatar, without accessing the camera or gallery.
-- The selected language is retained in memory and shown on the mobile screen;
-  this design update does not include full Sinhala/Tamil translations.
-
-Accounts survive sign-out in the current session and reset when the app restarts.
-Returning users always open their stored role. Only use sample details. No SMS,
-backend, Firebase, payment, GPS, or real Google requests are made. Dashboards remain
-minimal placeholders. The Android project configuration is preserved.
-
-## MVC structure
-
-- `lib/models/`: account/role model and validators.
-- `lib/controllers/auth_controller.dart`: flow state, verification, cooldown, consent,
-  role selection, loading/errors, and session management.
-- `lib/repositories/auth_repository.dart`: replaceable repository interface and local
-  asynchronous simulation with seeded Parent and Driver accounts.
-- `lib/views/`: welcome, mobile login, OTP, registration, and dashboard placeholders.
-- `lib/views/widgets/`: responsive shared layout, controls, and painted welcome scene.
-- `lib/theme/app_theme.dart`: teal, mint, white surfaces, typography, and field styles.
-
-## Checks
-
-```sh
 dart format lib test
 flutter analyze
 flutter test
 ```
 
-Tests cover phone normalization, issued/consumed challenges, six-digit validation,
-resend cooldown, consent, registration, stored roles, duplicate submission guards,
-Google simulation, sign-out, language selection, and narrow screens with keyboard insets.
+Source edits do not update the already-installed phone APK; run/reinstall the app to see them.
+Tests exercise both signup roles, returning accounts, new numbers via Sign In, validation,
+consent, photo simulation, Google simulation, OTP/resend, back navigation, splash disposal,
+and a 320×640 screen with keyboard insets.
+
+## Design assumptions
+
+The low-resolution screenshots do not identify the font family or splash timing. Android's
+standard Roboto typography and a 1.4-second splash are used. Role Selection includes a
+bottom Continue action as requested, although that action is not visible in its screenshot.
+Safe-area padding and scrolling adapt the 390×844 reference proportions to real devices;
+mock sample field values and consent are not prefilled for new users.

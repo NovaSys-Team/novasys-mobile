@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'controllers/auth_controller.dart';
 import 'repositories/auth_repository.dart';
 import 'theme/app_theme.dart';
-import 'views/auth_views.dart';
+import 'views/entry_views.dart';
 
 void main() => runApp(const NovaSysApp());
 
@@ -26,6 +26,6 @@ class _NovaSysAppState extends State<NovaSysApp> {
     title: 'NovaSys',
     debugShowCheckedModeBanner: false,
     theme: AppTheme.light,
-    home: WelcomeView(controller: controller),
+    home: SplashView(controller: controller),
   );
 }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../controllers/auth_controller.dart';
-import '../models/app_user.dart';
 import '../models/auth_validators.dart';
-import '../theme/app_theme.dart';
+import '../theme/auth_theme.dart';
 import 'auth_views.dart';
 import 'widgets/auth_layout.dart';
+import 'widgets/auth_details.dart';
 
 class RegistrationView extends StatefulWidget {
   const RegistrationView({super.key, required this.controller});
@@ -89,7 +89,6 @@ class _RegistrationViewState extends State<RegistrationView> {
             onBack: c.busy
                 ? null
                 : () {
-                    c.cancelVerification();
                     Navigator.pop(context);
                   },
             title: 'Create your account',
@@ -107,27 +106,14 @@ class _RegistrationViewState extends State<RegistrationView> {
                 children: [
                   Stack(
                     children: [
-                      Container(
-                        width: 76,
-                        height: 76,
-                        decoration: BoxDecoration(
-                          color: AppTheme.soft,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: AppTheme.muted),
-                        ),
-                        child: Icon(
-                          _photo ? Icons.person : Icons.camera_alt_outlined,
-                          size: 28,
-                          color: AppTheme.muted,
-                        ),
-                      ),
+                      ProfilePhotoPlaceholder(hasPhoto: _photo),
                       Positioned(
                         bottom: 0,
                         right: 0,
                         child: Container(
                           padding: const EdgeInsets.all(5),
                           decoration: const BoxDecoration(
-                            color: AppTheme.teal,
+                            color: AuthTheme.teal,
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -149,7 +135,7 @@ class _RegistrationViewState extends State<RegistrationView> {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: AppTheme.ink,
+                            color: AuthTheme.ink,
                           ),
                         ),
                         Text(
@@ -173,7 +159,7 @@ class _RegistrationViewState extends State<RegistrationView> {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.ink,
+                      color: AuthTheme.ink,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -194,7 +180,7 @@ class _RegistrationViewState extends State<RegistrationView> {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.ink,
+                      color: AuthTheme.ink,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -215,7 +201,7 @@ class _RegistrationViewState extends State<RegistrationView> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppTheme.soft,
+                color: AuthTheme.soft,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Row(
@@ -225,99 +211,17 @@ class _RegistrationViewState extends State<RegistrationView> {
                       c.displayPhone,
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.ink,
+                        color: AuthTheme.ink,
                       ),
                     ),
                   ),
-                  const Icon(Icons.check, size: 16, color: Colors.green),
+                  const Icon(Icons.check, size: 16, color: AuthTheme.verified),
                   const Text(
                     ' Verified',
-                    style: TextStyle(fontSize: 12, color: Colors.green),
+                    style: TextStyle(fontSize: 12, color: AuthTheme.verified),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 18),
-            const Text(
-              'I am a',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.ink,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                for (final role in UserRole.values) ...[
-                  if (role == UserRole.driver) const SizedBox(width: 10),
-                  Expanded(
-                    child: Semantics(
-                      selected: c.role == role,
-                      child: Material(
-                        color: c.role == role ? AppTheme.mint : Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: BorderSide(
-                            color: c.role == role
-                                ? AppTheme.teal
-                                : AppTheme.line,
-                            width: c.role == role ? 1.5 : 1,
-                          ),
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child: InkWell(
-                          onTap: c.busy ? null : () => c.selectRole(role),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Icon(
-                                      c.role == role
-                                          ? Icons.radio_button_checked
-                                          : Icons.radio_button_off,
-                                      size: 18,
-                                      color: c.role == role
-                                          ? AppTheme.teal
-                                          : AppTheme.muted,
-                                    ),
-                                  ],
-                                ),
-                                Icon(
-                                  role == UserRole.parent
-                                      ? Icons.people_outline
-                                      : Icons.directions_bus_outlined,
-                                  color: c.role == role
-                                      ? AppTheme.teal
-                                      : AppTheme.muted,
-                                ),
-                                Text(
-                                  role.label,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppTheme.ink,
-                                  ),
-                                ),
-                                Text(
-                                  role == UserRole.parent
-                                      ? 'Find a van for my child'
-                                      : 'I drive a school van',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(fontSize: 10),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ],
             ),
             const SizedBox(height: 12),
             Row(
@@ -346,7 +250,7 @@ class _RegistrationViewState extends State<RegistrationView> {
                     onPressed: () => showPolicy(context),
                     child: const Text(
                       'I agree to the Terms & Conditions and Privacy Policy',
-                      style: TextStyle(fontSize: 13, color: AppTheme.muted),
+                      style: TextStyle(fontSize: 13, color: AuthTheme.muted),
                     ),
                   ),
                 ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/app_theme.dart';
+import '../../theme/auth_theme.dart';
 
 class AuthLayout extends StatelessWidget {
   const AuthLayout({
@@ -15,33 +15,37 @@ class AuthLayout extends StatelessWidget {
   final Widget? footer;
   final double headerSpacing;
   @override
-  Widget build(BuildContext context) => Scaffold(
-    body: SafeArea(
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
-          child: LayoutBuilder(
-            builder: (context, constraints) => SingleChildScrollView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        if (header != null) ...[
-                          header!,
-                          SizedBox(height: headerSpacing),
+  Widget build(BuildContext context) => Theme(
+    data: AuthTheme.light,
+    child: Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: LayoutBuilder(
+              builder: (context, constraints) => SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          if (header != null) ...[
+                            header!,
+                            SizedBox(height: headerSpacing),
+                          ],
+                          ...children,
+                          if (footer != null) ...[
+                            const SizedBox(height: 24),
+                            const Spacer(),
+                            footer!,
+                          ],
                         ],
-                        ...children,
-                        if (footer != null) ...[
-                          const SizedBox(height: 24),
-                          const Spacer(),
-                          footer!,
-                        ],
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -66,7 +70,7 @@ class BackHeader extends StatelessWidget {
         onPressed: onBack,
         tooltip: 'Back',
         style: IconButton.styleFrom(
-          side: const BorderSide(color: AppTheme.line),
+          side: const BorderSide(color: AuthTheme.line),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(13),
           ),
@@ -85,6 +89,15 @@ class BackHeader extends StatelessWidget {
   );
 }
 
+/// Resolves typography inside the authentication theme, not the route's outer context.
+class AuthTitle extends StatelessWidget {
+  const AuthTitle(this.text, {super.key});
+  final String text;
+  @override
+  Widget build(BuildContext context) =>
+      Text(text, style: Theme.of(context).textTheme.headlineMedium);
+}
+
 class AuthHeading extends StatelessWidget {
   const AuthHeading(this.title, this.subtitle, {super.key});
   final String title;
@@ -93,14 +106,14 @@ class AuthHeading extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(title, style: Theme.of(context).textTheme.headlineMedium),
+      AuthTitle(title),
       const SizedBox(height: 8),
       Text(
         subtitle,
         style: const TextStyle(
           fontSize: 15,
           height: 1.5,
-          color: AppTheme.muted,
+          color: AuthTheme.muted,
         ),
       ),
       const SizedBox(height: 24),
