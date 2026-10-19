@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:novasys_mobile/main.dart';
 import 'package:novasys_mobile/views/entry_views.dart';
 import 'package:novasys_mobile/views/auth_views.dart';
+import 'package:novasys_mobile/views/parent/parent_preview.dart';
 import 'package:novasys_mobile/views/role_selection_view.dart';
 import 'package:novasys_mobile/views/registration_view.dart';
 
@@ -67,9 +68,14 @@ void main() {
         await t.tap(find.byType(Checkbox));
         await t.pumpAndSettle();
         await tap(t, 'Create ${role.toLowerCase()} account');
-        expect(find.text('$role dashboard'), findsOneWidget);
-        await tap(t, 'Sign out');
-        expect(find.byType(WelcomeView), findsOneWidget);
+        if (role == 'Parent') {
+          expect(find.byType(ParentHomePreview), findsOneWidget);
+          expect(find.text('Mrs. Perera'), findsOneWidget);
+        } else {
+          expect(find.text('$role dashboard'), findsOneWidget);
+          await tap(t, 'Sign out');
+          expect(find.byType(WelcomeView), findsOneWidget);
+        }
       },
     );
   }
@@ -80,7 +86,11 @@ void main() {
       await signIn(t, entry.$1);
       await t.enterText(find.byType(TextField), '123456');
       await tap(t, 'Verify');
-      expect(find.text('${entry.$2} dashboard'), findsOneWidget);
+      if (entry.$2 == 'Parent') {
+        expect(find.byType(ParentHomePreview), findsOneWidget);
+      } else {
+        expect(find.text('${entry.$2} dashboard'), findsOneWidget);
+      }
     });
   }
   testWidgets('new number via sign in selects role after verification', (
@@ -103,7 +113,7 @@ void main() {
     await t.tap(find.byType(Checkbox));
     await t.pumpAndSettle();
     await tap(t, 'Create parent account');
-    expect(find.text('Parent dashboard'), findsOneWidget);
+    expect(find.byType(ParentHomePreview), findsOneWidget);
   });
   testWidgets('mobile validation, OTP gating, resend and change phone', (
     t,
