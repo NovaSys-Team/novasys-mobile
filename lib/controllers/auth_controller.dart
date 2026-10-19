@@ -5,10 +5,16 @@ import 'package:flutter/foundation.dart';
 import '../models/app_user.dart';
 import '../models/auth_validators.dart';
 import '../repositories/auth_repository.dart';
+import '../repositories/mock_verification_repository.dart';
+import 'driver_verification_controller.dart';
 
 class AuthController extends ChangeNotifier {
   AuthController(this._repository);
   final AuthRepository _repository;
+  final driverVerification = DriverVerificationController(
+    MockVerificationRepository(),
+  );
+  bool signedInWithGoogle = false;
   UserRole role = UserRole.parent;
   AppUser? user;
   String language = 'English';
@@ -75,6 +81,7 @@ class AuthController extends ChangeNotifier {
     if (validation != null) throw AuthException(validation);
     final normalized = AuthValidators.normalizePhone(value);
     await _repository.sendCode(normalized);
+    signedInWithGoogle = false;
     phone = normalized;
     verified = false;
     user = null;
@@ -120,6 +127,7 @@ class AuthController extends ChangeNotifier {
   });
   Future<bool> googleDemo(UserRole role) => _run(() async {
     user = await _repository.googleDemo(role);
+    signedInWithGoogle = user != null;
     if (user != null) {
       this.role = user!.role;
       phone = user!.phone;
@@ -147,6 +155,8 @@ class AuthController extends ChangeNotifier {
   }
 
   void signOut() {
+    driverVerification.clearSession();
+    signedInWithGoogle = false;
     user = null;
     role = UserRole.parent;
     phone = '';
@@ -156,6 +166,7 @@ class AuthController extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    driverVerification.dispose();
     _timer?.cancel();
     super.dispose();
   }

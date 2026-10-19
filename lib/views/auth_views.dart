@@ -5,6 +5,7 @@ import '../models/app_user.dart';
 import '../theme/app_theme.dart';
 import '../theme/auth_theme.dart';
 import 'role_selection_view.dart';
+import 'driver_verification_view.dart';
 import 'widgets/welcome_hero.dart';
 
 class WelcomeView extends StatelessWidget {
@@ -163,6 +164,9 @@ class DashboardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = controller.user!;
+    if (user.role == UserRole.driver) {
+      return DriverVerificationView(auth: controller);
+    }
     return Scaffold(
       appBar: AppBar(title: Text('${user.role.label} dashboard')),
       body: SafeArea(

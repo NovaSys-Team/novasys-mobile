@@ -67,7 +67,12 @@ void main() {
         await t.tap(find.byType(Checkbox));
         await t.pumpAndSettle();
         await tap(t, 'Create ${role.toLowerCase()} account');
-        expect(find.text('$role dashboard'), findsOneWidget);
+        expect(
+          find.text(
+            role == 'Driver' ? 'Verify your documents' : 'Parent dashboard',
+          ),
+          findsOneWidget,
+        );
         await tap(t, 'Sign out');
         expect(find.byType(WelcomeView), findsOneWidget);
       },
@@ -80,7 +85,12 @@ void main() {
       await signIn(t, entry.$1);
       await t.enterText(find.byType(TextField), '123456');
       await tap(t, 'Verify');
-      expect(find.text('${entry.$2} dashboard'), findsOneWidget);
+      expect(
+        find.text(
+          entry.$2 == 'Driver' ? 'Verify your documents' : 'Parent dashboard',
+        ),
+        findsOneWidget,
+      );
     });
   }
   testWidgets('new number via sign in selects role after verification', (
@@ -135,7 +145,8 @@ void main() {
     await tap(t, 'Continue with Google');
     expect(find.text('Google sign-in demo'), findsOneWidget);
     await tap(t, 'Driver demo');
-    expect(find.text('Driver dashboard'), findsOneWidget);
+    expect(find.text('Verify your documents'), findsOneWidget);
+    expect(find.text('Signed in with Google'), findsOneWidget);
   });
   testWidgets(
     'small screen, language, back navigation and registration keyboard',
