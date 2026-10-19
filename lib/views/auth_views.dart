@@ -4,6 +4,7 @@ import '../controllers/auth_controller.dart';
 import '../models/app_user.dart';
 import '../theme/app_theme.dart';
 import '../theme/auth_theme.dart';
+import 'parent/parent_preview.dart';
 import 'role_selection_view.dart';
 import 'widgets/welcome_hero.dart';
 
@@ -152,7 +153,9 @@ class WelcomeView extends StatelessWidget {
 void openDashboard(BuildContext context, AuthController controller) =>
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute<void>(
-        builder: (_) => DashboardView(controller: controller),
+        builder: (_) => controller.role == UserRole.parent
+            ? const ParentHomePreview()
+            : DashboardView(controller: controller),
       ),
       (_) => false,
     );
