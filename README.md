@@ -5,6 +5,13 @@ The primary visual references are the five screenshots in `design_reference/auth
 Individual elements from `design_reference/auth_latest/` supply the decorative bus scene and
 Google mark. Screens and controls are Flutter widgets, not screenshot backgrounds.
 
+## Repository layout
+
+- Repository root — the Flutter Android application (`lib/`, `test/`, `android/`, `assets/`).
+- `backend/` — Spring Boot (Java 21) service foundation. Starts, uses an in-memory H2
+  development database and exposes an Actuator health check; it has no domain endpoints
+  and the Flutter app does not call it. See [`backend/README.md`](backend/README.md).
+
 ## Navigation
 
 - App launch: Splash (1.4 seconds) → Initial.
