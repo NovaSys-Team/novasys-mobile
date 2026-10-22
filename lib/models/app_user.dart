@@ -9,14 +9,16 @@ enum UserRole {
 class AppUser {
   const AppUser({
     required this.name,
-    required this.phone,
+    required this.email,
     required this.role,
-    this.email = '',
+    this.phone = '',
     this.hasPhoto = false,
   });
+
+  /// Email is the sign-in identity; mobile number is optional profile detail.
   final String name;
-  final String phone;
   final String email;
+  final String phone;
   final UserRole role;
   final bool hasPhoto;
 }
