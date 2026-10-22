@@ -44,20 +44,39 @@ class _PhotoBorder extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class NovaSysMark extends StatelessWidget {
-  const NovaSysMark({super.key});
+/// Mint rounded badge with an envelope, shown above "Check your email".
+class MailBadge extends StatelessWidget {
+  const MailBadge({super.key, this.size = 64});
+  final double size;
   @override
-  Widget build(BuildContext context) => const SizedBox(
-    width: 22,
-    height: 22,
-    child: CustomPaint(painter: _MarkPainter()),
+  Widget build(BuildContext context) => Container(
+    width: size,
+    height: size,
+    decoration: BoxDecoration(
+      color: AuthTheme.mint,
+      borderRadius: BorderRadius.circular(size * .28),
+    ),
+    child: Icon(Icons.mail_outline, size: size * .45, color: AuthTheme.teal),
   );
 }
 
+class NovaSysMark extends StatelessWidget {
+  const NovaSysMark({super.key, this.size = 22});
+  final double size;
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: size,
+    height: size,
+    child: const CustomPaint(painter: _MarkPainter()),
+  );
+}
+
+/// Draws the mark on a 22x22 reference canvas and scales to the given size.
 class _MarkPainter extends CustomPainter {
   const _MarkPainter();
   @override
   void paint(Canvas canvas, Size size) {
+    canvas.scale(size.width / 22, size.height / 22);
     final paint = Paint()
       ..color = AuthTheme.teal
       ..style = PaintingStyle.stroke

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../controllers/auth_controller.dart';
 import '../models/driver_verification.dart';
-import 'auth_views.dart';
 import 'driver_account_completion_view.dart';
+import 'entry_views.dart';
 
 const _teal = Color(0xFF0A7C70);
 const _ink = Color(0xFF0F2A29);
@@ -185,7 +185,7 @@ class _ProfileHeader extends StatelessWidget {
             auth.signOut();
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute<void>(
-                builder: (_) => WelcomeView(controller: auth),
+                builder: (_) => InitialView(controller: auth),
               ),
               (_) => false,
             );

@@ -1,0 +1,15 @@
+# Maven build output
+target/
+
+# Maven wrapper (not used; the project relies on a system Maven install)
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+
+# Logs
+*.log

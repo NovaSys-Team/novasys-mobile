@@ -9,6 +9,7 @@ import 'package:novasys_mobile/theme/app_theme.dart';
 import 'package:novasys_mobile/views/auth_views.dart';
 import 'package:novasys_mobile/views/driver_verification_view.dart';
 import 'package:novasys_mobile/views/driver_account_completion_view.dart';
+import 'package:novasys_mobile/views/entry_views.dart';
 
 Future<void> tap(WidgetTester t, Finder finder) async {
   await t.ensureVisible(finder);
@@ -30,6 +31,7 @@ void main() {
       addTearDown(auth.dispose);
       auth.user = const AppUser(
         name: 'Ruwan Jayasinghe',
+        email: DemoEmails.driver,
         phone: '772345678',
         role: UserRole.driver,
       );
@@ -123,7 +125,7 @@ void main() {
         VerificationStatus.incomplete,
       );
       expect(auth.driverVerification.verification.documents.length, 2);
-      expect(find.byType(WelcomeView), findsOneWidget);
+      expect(find.byType(InitialView), findsOneWidget);
     });
   }
 
@@ -136,6 +138,7 @@ void main() {
     addTearDown(auth.dispose);
     auth.user = const AppUser(
       name: 'Ruwan Jayasinghe Long Driver Name',
+      email: DemoEmails.driver,
       phone: '772345678',
       role: UserRole.driver,
     );
