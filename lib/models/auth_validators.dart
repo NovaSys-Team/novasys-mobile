@@ -1,10 +1,23 @@
 abstract final class AuthValidators {
   static String? name(String? value) =>
       (value ?? '').trim().length < 2 ? 'Enter your full name.' : null;
+
+  static String normalizeEmail(String? value) =>
+      (value ?? '').trim().toLowerCase();
+
+  static final _email = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]{2,}$');
+
+  /// Sign-in identity: an address is required and must be well formed.
+  static String? requiredEmail(String? value) {
+    final email = normalizeEmail(value);
+    if (email.isEmpty) return 'Enter your email address.';
+    return _email.hasMatch(email) ? null : 'Enter a valid email address.';
+  }
+
+  /// Optional profile field: blank is allowed, anything else must be valid.
   static String? email(String? value) {
-    final email = (value ?? '').trim();
-    return email.isEmpty ||
-            RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email)
+    final email = normalizeEmail(value);
+    return email.isEmpty || _email.hasMatch(email)
         ? null
         : 'Enter a valid email address.';
   }
@@ -20,4 +33,8 @@ abstract final class AuthValidators {
       RegExp(r'^7\d{8}$').hasMatch(normalizePhone(value ?? ''))
       ? null
       : 'Enter a valid 9-digit Sri Lankan mobile number.';
+
+  /// Optional profile field during registration.
+  static String? optionalPhone(String? value) =>
+      (value ?? '').trim().isEmpty ? null : phone(value);
 }

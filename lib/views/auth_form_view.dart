@@ -10,6 +10,7 @@ import 'auth_views.dart';
 import 'otp_view.dart';
 import 'widgets/auth_layout.dart';
 
+/// P02 — Sign in or create account with an email address.
 class AuthFormView extends StatefulWidget {
   const AuthFormView({
     super.key,
@@ -24,17 +25,24 @@ class AuthFormView extends StatefulWidget {
 
 class _AuthFormViewState extends State<AuthFormView> {
   final _form = GlobalKey<FormState>();
-  final _phone = TextEditingController();
+  final _email = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _email.text = widget.controller.email;
+  }
+
   @override
   void dispose() {
-    _phone.dispose();
+    _email.dispose();
     super.dispose();
   }
 
   Future<void> _send() async {
     if (!_form.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
-    if (await widget.controller.sendCode(_phone.text) && mounted) {
+    if (await widget.controller.sendCode(_email.text) && mounted) {
       await Navigator.push(
         context,
         MaterialPageRoute<void>(
@@ -56,7 +64,8 @@ class _AuthFormViewState extends State<AuthFormView> {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             child: Text(
-              'Choose a sample Google account. No Google account will be accessed.',
+              'Google OAuth is not wired up yet. Choose a sample account to '
+              'continue; no Google account will be accessed.',
             ),
           ),
           for (final role in UserRole.values)
@@ -82,27 +91,6 @@ class _AuthFormViewState extends State<AuthFormView> {
         child: AuthLayout(
           header: BackHeader(
             onBack: c.busy ? null : () => Navigator.pop(context),
-            trailing: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-              decoration: BoxDecoration(
-                color: AuthTheme.soft,
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.language, size: 16),
-                  const SizedBox(width: 6),
-                  Text(
-                    c.language,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AuthTheme.ink,
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ),
           footer: TextButton(
             onPressed: () => showPolicy(context),
@@ -133,11 +121,12 @@ class _AuthFormViewState extends State<AuthFormView> {
           ),
           children: [
             const AuthHeading(
-              'Enter your mobile number',
-              'We’ll send you a 6-digit code to sign in or create your account.',
+              'Sign in or create account',
+              'We’ll email you a 6-digit code to sign in. New here? Enter '
+                  'your email to create a new account.',
             ),
             const Text(
-              'Mobile number',
+              'Email address',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -148,49 +137,39 @@ class _AuthFormViewState extends State<AuthFormView> {
             Form(
               key: _form,
               child: TextFormField(
-                controller: _phone,
+                controller: _email,
                 enabled: !c.busy,
-                keyboardType: TextInputType.phone,
+                keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.done,
-                autofillHints: const [AutofillHints.telephoneNumberNational],
+                autocorrect: false,
+                autofillHints: const [AutofillHints.email],
                 inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9 +]')),
-                  LengthLimitingTextInputFormatter(16),
+                  FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                  LengthLimitingTextInputFormatter(120),
                 ],
-                validator: AuthValidators.phone,
+                validator: AuthValidators.requiredEmail,
                 onFieldSubmitted: (_) {
                   if (!c.busy) _send();
                 },
-                decoration: InputDecoration(
-                  hintText: '77 123 4567',
+                style: const TextStyle(fontSize: 16, color: AuthTheme.ink),
+                decoration: const InputDecoration(
+                  hintText: 'you@example.com',
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 18,
+                  ),
+                  prefixIcon: Padding(
+                    padding: EdgeInsets.only(left: 18, right: 14),
+                    child: Icon(
+                      Icons.mail_outline,
+                      size: 20,
+                      color: AuthTheme.teal,
+                    ),
+                  ),
+                  prefixIconConstraints: BoxConstraints(minWidth: 0),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(14)),
                     borderSide: BorderSide(color: AuthTheme.teal, width: 1.6),
-                  ),
-                  prefixIconConstraints: BoxConstraints(minHeight: 58),
-                  prefixIcon: Container(
-                    margin: EdgeInsets.only(
-                      right: 14,
-                      left: 2,
-                      top: 2,
-                      bottom: 2,
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 13, vertical: 15),
-                    decoration: BoxDecoration(
-                      color: AuthTheme.soft,
-                      borderRadius: BorderRadius.horizontal(
-                        left: Radius.circular(13),
-                      ),
-                      border: Border(right: BorderSide(color: AuthTheme.line)),
-                    ),
-                    child: Text(
-                      'LK +94',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AuthTheme.ink,
-                      ),
-                    ),
                   ),
                 ),
               ),

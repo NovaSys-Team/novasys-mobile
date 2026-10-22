@@ -17,13 +17,13 @@ class RegistrationView extends StatefulWidget {
 class _RegistrationViewState extends State<RegistrationView> {
   final _form = GlobalKey<FormState>();
   final _name = TextEditingController();
-  final _email = TextEditingController();
+  final _phone = TextEditingController();
   bool _consent = false;
   bool _photo = false;
   @override
   void dispose() {
     _name.dispose();
-    _email.dispose();
+    _phone.dispose();
     super.dispose();
   }
 
@@ -32,7 +32,7 @@ class _RegistrationViewState extends State<RegistrationView> {
     FocusScope.of(context).unfocus();
     if (await widget.controller.register(
           name: _name.text,
-          email: _email.text,
+          phone: _phone.text,
           consent: _consent,
           hasPhoto: _photo,
         ) &&
@@ -176,7 +176,7 @@ class _RegistrationViewState extends State<RegistrationView> {
                   ),
                   const SizedBox(height: 18),
                   const Text(
-                    'Email (optional)',
+                    'Mobile number (optional)',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -185,14 +185,14 @@ class _RegistrationViewState extends State<RegistrationView> {
                   ),
                   const SizedBox(height: 6),
                   TextFormField(
-                    controller: _email,
+                    controller: _phone,
                     enabled: !c.busy,
-                    validator: AuthValidators.email,
-                    keyboardType: TextInputType.emailAddress,
-                    autofillHints: const [AutofillHints.email],
-                    decoration: const InputDecoration(
-                      hintText: 'you@example.com',
-                    ),
+                    validator: AuthValidators.optionalPhone,
+                    keyboardType: TextInputType.phone,
+                    autofillHints: const [
+                      AutofillHints.telephoneNumberNational,
+                    ],
+                    decoration: const InputDecoration(hintText: '77 123 4567'),
                   ),
                 ],
               ),
@@ -208,7 +208,8 @@ class _RegistrationViewState extends State<RegistrationView> {
                 children: [
                   Expanded(
                     child: Text(
-                      c.displayPhone,
+                      c.displayEmail,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         color: AuthTheme.ink,

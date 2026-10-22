@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:novasys_mobile/main.dart';
+import 'package:novasys_mobile/repositories/auth_repository.dart';
 import 'package:novasys_mobile/views/entry_views.dart';
-import 'package:novasys_mobile/views/auth_views.dart';
 import 'package:novasys_mobile/views/parent/parent_preview.dart';
-import 'package:novasys_mobile/views/role_selection_view.dart';
 import 'package:novasys_mobile/views/registration_view.dart';
+import 'package:novasys_mobile/views/role_selection_view.dart';
+import 'package:novasys_mobile/views/widgets/otp_boxes.dart';
 
 Future<void> tap(WidgetTester t, String text) async {
   final f = find.text(text);
@@ -21,44 +22,65 @@ Future<void> launch(WidgetTester t) async {
   await t.pump(const Duration(milliseconds: 1400));
   await t.pumpAndSettle();
   expect(find.byType(InitialView), findsOneWidget);
+  expect(find.text('Safe rides to school, every day'), findsOneWidget);
 }
 
-Future<void> signIn(WidgetTester t, String phone) async {
-  await launch(t);
-  await tap(t, 'Sign In');
-  await t.enterText(find.byType(TextFormField), phone);
+Future<void> sendCodeTo(WidgetTester t, String email) async {
+  await t.enterText(find.byType(TextFormField), email);
   await tap(t, 'Send code');
+}
+
+Future<void> enterCode(WidgetTester t, String code) async {
+  await t.enterText(
+    find.descendant(
+      of: find.byType(OtpBoxes),
+      matching: find.byType(TextField),
+    ),
+    code,
+  );
+  await t.pumpAndSettle();
+}
+
+Future<void> signIn(WidgetTester t, String email) async {
+  await launch(t);
+  await tap(t, 'I already have an account');
+  expect(find.text('Sign in or create account'), findsOneWidget);
+  await sendCodeTo(t, email);
+  expect(find.text('Check your email'), findsOneWidget);
 }
 
 Future<void> signup(WidgetTester t, String role) async {
   await launch(t);
-  await tap(t, 'Create an Account');
-  expect(find.byType(WelcomeView), findsOneWidget);
-  await tap(t, 'Continue');
+  await tap(t, 'Get started');
   expect(find.byType(RoleSelectionView), findsOneWidget);
   await tap(t, role);
   await tap(t, 'Continue');
-  await t.enterText(find.byType(TextFormField), '779999999');
-  await tap(t, 'Send code');
-  await t.enterText(find.byType(TextField), '123456');
-  await tap(t, 'Verify');
+  await sendCodeTo(t, 'new.${role.toLowerCase()}@example.com');
+  await enterCode(t, '123456');
+  await tap(t, 'Verify & continue');
   expect(find.byType(RegistrationView), findsOneWidget);
 }
 
 void main() {
   WidgetController.hitTestWarningShouldBeFatal = true;
+
   for (final role in ['Parent', 'Driver']) {
     testWidgets(
       '$role complete signup flow, validation, photo, and dashboard',
       (t) async {
         await signup(t, role);
         expect(find.text('I am a'), findsNothing);
+        // The verified email is carried into registration.
+        expect(
+          find.text('new.${role.toLowerCase()}@example.com'),
+          findsOneWidget,
+        );
         await tap(t, 'Create ${role.toLowerCase()} account');
         expect(find.text('Enter your full name.'), findsOneWidget);
         await t.enterText(find.byType(TextFormField).first, 'New $role');
-        await t.enterText(find.byType(TextFormField).last, 'invalid');
+        await t.enterText(find.byType(TextFormField).last, '123');
         await tap(t, 'Create ${role.toLowerCase()} account');
-        expect(find.text('Enter a valid email address.'), findsOneWidget);
+        expect(find.textContaining('valid 9-digit'), findsOneWidget);
         await t.enterText(find.byType(TextFormField).last, '');
         await tap(t, 'Create ${role.toLowerCase()} account');
         expect(find.textContaining('Agree to the Terms'), findsOneWidget);
@@ -74,18 +96,23 @@ void main() {
         } else {
           expect(find.text('$role dashboard'), findsOneWidget);
           await tap(t, 'Sign out');
-          expect(find.byType(WelcomeView), findsOneWidget);
+          expect(find.byType(InitialView), findsOneWidget);
         }
       },
     );
   }
-  for (final entry in [('771234567', 'Parent'), ('772345678', 'Driver')]) {
+
+  for (final entry in [
+    (DemoEmails.parent, 'Parent'),
+    (DemoEmails.driver, 'Driver'),
+  ]) {
     testWidgets('${entry.$2} existing account bypasses registration', (
       t,
     ) async {
       await signIn(t, entry.$1);
-      await t.enterText(find.byType(TextField), '123456');
-      await tap(t, 'Verify');
+      expect(find.text('${entry.$1}.'), findsOneWidget);
+      await enterCode(t, '123456');
+      await tap(t, 'Verify & continue');
       if (entry.$2 == 'Parent') {
         expect(find.byType(ParentHomePreview), findsOneWidget);
       } else {
@@ -93,12 +120,13 @@ void main() {
       }
     });
   }
-  testWidgets('new number via sign in selects role after verification', (
+
+  testWidgets('new address via sign in selects role after verification', (
     t,
   ) async {
-    await signIn(t, '779999999');
-    await t.enterText(find.byType(TextField), '123456');
-    await tap(t, 'Verify');
+    await signIn(t, 'fresh@example.com');
+    await enterCode(t, '123456');
+    await tap(t, 'Verify & continue');
     expect(find.byType(RoleSelectionView), findsOneWidget);
     await tap(t, 'Driver');
     await tap(t, 'Continue');
@@ -115,75 +143,120 @@ void main() {
     await tap(t, 'Create parent account');
     expect(find.byType(ParentHomePreview), findsOneWidget);
   });
-  testWidgets('mobile validation, OTP gating, resend and change phone', (
+
+  testWidgets('email validation, code gating, resend and change email', (
     t,
   ) async {
     await launch(t);
-    await tap(t, 'Sign In');
+    await tap(t, 'I already have an account');
     await tap(t, 'Send code');
-    expect(find.textContaining('Enter a valid 9-digit'), findsOneWidget);
-    await t.enterText(find.byType(TextFormField), '771234567');
+    expect(find.text('Enter your email address.'), findsOneWidget);
+    await t.enterText(find.byType(TextFormField), 'not-an-email');
     await tap(t, 'Send code');
-    await t.enterText(find.byType(TextField), '1234');
-    await t.pump();
+    expect(find.text('Enter a valid email address.'), findsOneWidget);
+    await sendCodeTo(t, DemoEmails.parent);
+    expect(find.text('Enter the 6-digit code from your email'), findsOneWidget);
+    await enterCode(t, '1234');
     expect(
       t
-          .widget<FilledButton>(find.widgetWithText(FilledButton, 'Verify'))
+          .widget<FilledButton>(
+            find.widgetWithText(FilledButton, 'Verify & continue'),
+          )
           .onPressed,
       isNull,
     );
-    await t.pump(const Duration(seconds: 31));
+    await enterCode(t, '123456');
+    expect(find.text('Code complete · tap Verify'), findsOneWidget);
+    expect(find.textContaining('Resend in'), findsOneWidget);
+    await t.pump(const Duration(seconds: 46));
     await t.pumpAndSettle();
     await tap(t, 'Resend code');
     expect(find.textContaining('Resend in'), findsOneWidget);
-    await tap(t, 'Change');
-    expect(find.text('Enter your mobile number'), findsOneWidget);
+    await tap(t, 'Change email');
+    expect(find.text('Sign in or create account'), findsOneWidget);
+    // The address is kept so it does not have to be retyped.
+    expect(find.text(DemoEmails.parent), findsOneWidget);
   });
+
+  testWidgets('prototype shortcut signs in as the sample parent', (t) async {
+    await signIn(t, 'fresh@example.com');
+    await tap(t, 'Existing parent');
+    expect(find.byType(ParentHomePreview), findsOneWidget);
+  });
+
+  testWidgets('prototype shortcut opens the new account path', (t) async {
+    await signIn(t, 'fresh@example.com');
+    await tap(t, 'Create account');
+    expect(find.byType(RoleSelectionView), findsOneWidget);
+  });
+
   testWidgets('Google remains an explicit simulation', (t) async {
     await launch(t);
-    await tap(t, 'Sign In');
+    await tap(t, 'I already have an account');
     await tap(t, 'Continue with Google');
     expect(find.text('Google sign-in demo'), findsOneWidget);
+    expect(find.textContaining('not wired up yet'), findsOneWidget);
     await tap(t, 'Driver demo');
     expect(find.text('Driver dashboard'), findsOneWidget);
   });
-  testWidgets(
-    'small screen, language, back navigation and registration keyboard',
-    (t) async {
-      t.view.physicalSize = const Size(320, 640);
+
+  testWidgets('small screen, back navigation and registration keyboard', (
+    t,
+  ) async {
+    t.view.physicalSize = const Size(320, 640);
+    t.view.devicePixelRatio = 1;
+    addTearDown(t.view.resetPhysicalSize);
+    addTearDown(t.view.resetDevicePixelRatio);
+    addTearDown(t.view.resetViewInsets);
+    await launch(t);
+    await tap(t, 'Get started');
+    await tap(t, 'Driver');
+    await t.ensureVisible(find.byTooltip('Back'));
+    await t.tap(find.byTooltip('Back'));
+    await t.pumpAndSettle();
+    expect(find.byType(InitialView), findsOneWidget);
+    await tap(t, 'Get started');
+    await tap(t, 'Parent');
+    await tap(t, 'Continue');
+    t.view.viewInsets = const FakeViewPadding(bottom: 260);
+    await t.pump();
+    await sendCodeTo(t, 'small.screen@example.com');
+    await enterCode(t, '123456');
+    await tap(t, 'Verify & continue');
+    await t.enterText(find.byType(TextFormField).first, 'Small Screen');
+    await t.pumpAndSettle();
+    await t.drag(
+      find.byType(SingleChildScrollView).last,
+      const Offset(0, -300),
+    );
+    await t.pumpAndSettle();
+    await tap(t, 'Create parent account');
+    expect(find.textContaining('Agree to the Terms'), findsOneWidget);
+    expect(t.takeException(), isNull);
+  });
+
+  for (final size in [
+    const Size(390, 844),
+    const Size(360, 640),
+    const Size(320, 568),
+  ]) {
+    testWidgets('the three auth screens lay out at ${size.width.toInt()}x'
+        '${size.height.toInt()}', (t) async {
+      t.view.physicalSize = size;
       t.view.devicePixelRatio = 1;
       addTearDown(t.view.resetPhysicalSize);
       addTearDown(t.view.resetDevicePixelRatio);
-      addTearDown(t.view.resetViewInsets);
       await launch(t);
-      await tap(t, 'Create an Account');
-      await tap(t, 'සිංහල');
-      await tap(t, 'Continue');
-      await tap(t, 'Driver');
-      await t.ensureVisible(find.byTooltip('Back'));
-      await t.tap(find.byTooltip('Back'));
-      await t.pumpAndSettle();
-      await tap(t, 'Continue');
-      await tap(t, 'Continue');
-      expect(find.text('Sinhala'), findsOneWidget);
-      t.view.viewInsets = const FakeViewPadding(bottom: 260);
-      await t.pump();
-      await t.enterText(find.byType(TextFormField), '779999999');
-      await tap(t, 'Send code');
-      await t.enterText(find.byType(TextField), '123456');
-      await tap(t, 'Verify');
-      await t.enterText(find.byType(TextFormField).first, 'Small Screen');
-      await t.pumpAndSettle();
-      await t.drag(
-        find.byType(SingleChildScrollView).last,
-        const Offset(0, -300),
-      );
-      await t.pumpAndSettle();
-      await tap(t, 'Create driver account');
-      expect(find.textContaining('Agree to the Terms'), findsOneWidget);
+      expect(find.text('Get started'), findsOneWidget);
+      await tap(t, 'I already have an account');
+      expect(find.text('Email address'), findsOneWidget);
+      await sendCodeTo(t, DemoEmails.driver);
+      expect(find.byType(OtpBoxes), findsOneWidget);
+      expect(find.text('Verification code'), findsOneWidget);
       expect(t.takeException(), isNull);
-    },
-  );
+    });
+  }
+
   testWidgets('splash timer is cancelled on disposal', (t) async {
     await t.pumpWidget(const NovaSysApp());
     await t.pumpWidget(const SizedBox());

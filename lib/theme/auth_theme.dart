@@ -5,7 +5,9 @@ import 'app_theme.dart';
 /// Latest exported auth tokens, scoped so dashboard styling is unchanged.
 abstract final class AuthTheme {
   static const teal = Color(0xFF0A7C70);
+  static const deep = Color(0xFF0B3B3A);
   static const mint = Color(0xFFE6F5F3);
+  static const slate = Color(0xFF4A5D5B);
   static const ink = Color(0xFF0F2A29);
   static const muted = Color(0xFF5E6F6D);
   static const line = Color(0xFFDCE5E3);
@@ -23,8 +25,12 @@ abstract final class AuthTheme {
             color: ink,
             fontWeight: FontWeight.w600,
           ),
+          // Reference headings measure ~30px with no negative tracking,
+          // where the global theme uses 28px at -0.6.
           headlineMedium: AppTheme.light.textTheme.headlineMedium!.copyWith(
             color: ink,
+            fontSize: 30,
+            letterSpacing: 0,
           ),
           titleLarge: AppTheme.light.textTheme.titleLarge!.copyWith(color: ink),
         ),

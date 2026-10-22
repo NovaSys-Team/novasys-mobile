@@ -11,10 +11,10 @@ class RoleSelectionView extends StatelessWidget {
   const RoleSelectionView({
     super.key,
     required this.controller,
-    this.phoneVerified = false,
+    this.identityVerified = false,
   });
   final AuthController controller;
-  final bool phoneVerified;
+  final bool identityVerified;
   @override
   Widget build(BuildContext context) => Theme(
     data: AuthTheme.light,
@@ -151,7 +151,7 @@ class RoleSelectionView extends StatelessWidget {
                             onPressed: () => Navigator.push(
                               context,
                               MaterialPageRoute<void>(
-                                builder: (_) => phoneVerified
+                                builder: (_) => identityVerified
                                     ? RegistrationView(controller: controller)
                                     : AuthFormView(
                                         controller: controller,

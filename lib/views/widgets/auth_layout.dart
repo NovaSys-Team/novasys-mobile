@@ -111,8 +111,8 @@ class AuthHeading extends StatelessWidget {
       Text(
         subtitle,
         style: const TextStyle(
-          fontSize: 15,
-          height: 1.5,
+          fontSize: 16,
+          height: 1.4,
           color: AuthTheme.muted,
         ),
       ),
@@ -170,7 +170,10 @@ void showPolicy(BuildContext context) => showDialog<void>(
   builder: (context) => AlertDialog(
     title: const Text('Terms & Privacy Policy'),
     content: const Text(
-      'NovaSys demo\n\nUse sample information only. Account details stay in memory until the app restarts. No SMS is sent and no Google account is accessed. This preview does not book or track transport.',
+      'NovaSys demo\n\nUse sample information only. Account details stay in '
+      'memory until the app restarts. No email is sent and no Google account '
+      'is accessed: the verification code is checked on the device. This '
+      'preview does not book or track transport.',
     ),
     actions: [
       TextButton(
