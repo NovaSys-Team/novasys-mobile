@@ -5,12 +5,74 @@ class Child {
     required this.school,
     this.grade = '',
     this.hasTransport = false,
+    this.dateOfBirth,
+    this.className = '',
+    this.address = '',
+    this.allergies = 'None reported',
+    this.medicalNotes = 'None reported',
+    this.emergencyContact = 'Not provided',
+    this.handoverPin = '4279',
+    this.pickupPeople = const [],
   });
   final String id;
   final String name;
   final String school;
   final String grade;
   final bool hasTransport;
+  final DateTime? dateOfBirth;
+  final String className;
+  final String address;
+  final String allergies;
+  final String medicalNotes;
+  final String emergencyContact;
+  final String handoverPin;
+  final List<PickupPerson> pickupPeople;
+
+  Child copyWith({
+    String? name,
+    String? school,
+    String? grade,
+    DateTime? dateOfBirth,
+    String? className,
+    String? address,
+    List<PickupPerson>? pickupPeople,
+  }) => Child(
+    id: id,
+    name: name ?? this.name,
+    school: school ?? this.school,
+    grade: grade ?? this.grade,
+    hasTransport: hasTransport,
+    dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+    className: className ?? this.className,
+    address: address ?? this.address,
+    allergies: allergies,
+    medicalNotes: medicalNotes,
+    emergencyContact: emergencyContact,
+    handoverPin: handoverPin,
+    pickupPeople: pickupPeople ?? this.pickupPeople,
+  );
+}
+
+class PickupPerson {
+  const PickupPerson({
+    required this.name,
+    required this.relationship,
+    this.needsPin = false,
+  });
+  final String name;
+  final String relationship;
+  final bool needsPin;
+}
+
+class ParentProfile {
+  const ParentProfile({
+    required this.name,
+    required this.phone,
+    required this.email,
+  });
+  final String name;
+  final String phone;
+  final String email;
 }
 
 class TransportInfo {

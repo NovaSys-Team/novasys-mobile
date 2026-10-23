@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../controllers/auth_controller.dart';
 import '../models/app_user.dart';
+import '../models/parent_models.dart';
 import '../theme/app_theme.dart';
 import 'entry_views.dart';
 import 'parent/parent_preview.dart';
@@ -10,7 +11,22 @@ void openDashboard(BuildContext context, AuthController controller) =>
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute<void>(
         builder: (_) => controller.role == UserRole.parent
-            ? const ParentHomePreview()
+            ? ParentHomePreview(
+                profile: ParentProfile(
+                  name: controller.user!.name,
+                  phone: controller.user!.phone,
+                  email: controller.user!.email,
+                ),
+                onSignOut: (context) {
+                  controller.signOut();
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute<void>(
+                      builder: (_) => InitialView(controller: controller),
+                    ),
+                    (_) => false,
+                  );
+                },
+              )
             : DashboardView(controller: controller),
       ),
       (_) => false,
