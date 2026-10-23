@@ -47,7 +47,12 @@ class ParentHomeView extends StatelessWidget {
           const SliverToBoxAdapter(child: SizedBox(height: 20)),
           const SliverToBoxAdapter(child: FeatureCards()),
           const SliverToBoxAdapter(child: SizedBox(height: 20)),
-          SliverToBoxAdapter(child: FeesSection(fee: controller.currentFee)),
+          SliverToBoxAdapter(
+            child: FeesSection(
+              fee: controller.currentFee,
+              onPay: () => controller.selectNavTab(2),
+            ),
+          ),
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
       );

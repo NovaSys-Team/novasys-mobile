@@ -4,6 +4,7 @@ import '../../controllers/parent_home_controller.dart';
 import '../../theme/parent_home_theme.dart';
 import 'new_parent_home_view.dart';
 import 'parent_home_view.dart';
+import 'payments/payments_view.dart';
 import 'parent_account_view.dart';
 import 'widgets/parent_bottom_nav.dart';
 
@@ -22,6 +23,12 @@ class ParentHomeShell extends StatelessWidget {
         child: ListenableBuilder(
           listenable: controller,
           builder: (context, _) {
+            if (controller.bottomNavIndex == 2) {
+              return PaymentsView(
+                controller: controller.payments,
+                onBack: () => controller.selectNavTab(0),
+              );
+            }
             if (controller.bottomNavIndex == 4) {
               return ParentAccountView(
                 controller: controller,

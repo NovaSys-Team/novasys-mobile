@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../models/parent_models.dart';
+import 'parent_payments_controller.dart';
 
 class ParentHomeController extends ChangeNotifier {
   ParentHomeController({this.isNewParent = false, ParentProfile? profile})
@@ -10,7 +11,18 @@ class ParentHomeController extends ChangeNotifier {
             name: 'Nadeesha Perera',
             phone: '+94 77 123 4567',
             email: 'nadeesha.perera@example.com',
-          );
+          ) {
+    payments.addListener(notifyListeners);
+  }
+
+  final payments = ParentPaymentsController();
+
+  @override
+  void dispose() {
+    payments.removeListener(notifyListeners);
+    payments.dispose();
+    super.dispose();
+  }
 
   ParentProfile profile;
   bool darkMode = false;
@@ -154,10 +166,11 @@ class ParentHomeController extends ChangeNotifier {
     ),
   ];
 
-  final FeeInfo currentFee = const FeeInfo(
+  FeeInfo get currentFee => FeeInfo(
     month: 'October',
     amount: 8500,
     dueDate: 'Oct 25',
+    isPaid: payments.isPaid,
   );
 
   Child get selectedChild => children[selectedChildIndex];

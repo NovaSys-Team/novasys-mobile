@@ -4,8 +4,9 @@ import '../../../models/parent_models.dart';
 import '../../../theme/parent_home_theme.dart';
 
 class FeesSection extends StatelessWidget {
-  const FeesSection({super.key, required this.fee});
+  const FeesSection({super.key, required this.fee, required this.onPay});
   final FeeInfo fee;
+  final VoidCallback onPay;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -98,17 +99,7 @@ class FeesSection extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: OutlinedButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context)
-                ..clearSnackBars()
-                ..showSnackBar(
-                  const SnackBar(
-                    content: Text('Payment — coming soon'),
-                    behavior: SnackBarBehavior.floating,
-                    duration: Duration(seconds: 1),
-                  ),
-                );
-            },
+            onPressed: onPay,
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 12),
               side: const BorderSide(color: ParentHomeTheme.line),
@@ -116,8 +107,8 @@ class FeesSection extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text(
-              'Pay now',
+            child: Text(
+              fee.isPaid ? 'View payments' : 'Pay now',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
