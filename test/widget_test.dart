@@ -94,7 +94,7 @@ void main() {
           expect(find.byType(ParentHomePreview), findsOneWidget);
           expect(find.text('Mrs. Perera'), findsOneWidget);
         } else {
-          expect(find.text('$role dashboard'), findsOneWidget);
+          expect(find.text('Verify your documents'), findsOneWidget);
           await tap(t, 'Sign out');
           expect(find.byType(InitialView), findsOneWidget);
         }
@@ -116,7 +116,7 @@ void main() {
       if (entry.$2 == 'Parent') {
         expect(find.byType(ParentHomePreview), findsOneWidget);
       } else {
-        expect(find.text('${entry.$2} dashboard'), findsOneWidget);
+        expect(find.text('Verify your documents'), findsOneWidget);
       }
     });
   }
@@ -197,7 +197,8 @@ void main() {
     expect(find.text('Google sign-in demo'), findsOneWidget);
     expect(find.textContaining('not wired up yet'), findsOneWidget);
     await tap(t, 'Driver demo');
-    expect(find.text('Driver dashboard'), findsOneWidget);
+    expect(find.text('Verify your documents'), findsOneWidget);
+    expect(find.text('Signed in with Google'), findsOneWidget);
   });
 
   testWidgets('small screen, back navigation and registration keyboard', (

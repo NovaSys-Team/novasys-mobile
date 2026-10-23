@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../controllers/auth_controller.dart';
 import '../models/app_user.dart';
 import '../theme/app_theme.dart';
+import 'driver_verification_view.dart';
 import 'entry_views.dart';
 import 'parent/parent_preview.dart';
 
@@ -22,6 +23,9 @@ class DashboardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = controller.user!;
+    if (user.role == UserRole.driver) {
+      return DriverVerificationView(auth: controller);
+    }
     return Scaffold(
       appBar: AppBar(title: Text('${user.role.label} dashboard')),
       body: SafeArea(
