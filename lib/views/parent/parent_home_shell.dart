@@ -4,11 +4,13 @@ import '../../controllers/parent_home_controller.dart';
 import '../../theme/parent_home_theme.dart';
 import 'new_parent_home_view.dart';
 import 'parent_home_view.dart';
+import 'parent_account_view.dart';
 import 'widgets/parent_bottom_nav.dart';
 
 class ParentHomeShell extends StatelessWidget {
-  const ParentHomeShell({super.key, required this.controller});
+  const ParentHomeShell({super.key, required this.controller, this.onSignOut});
   final ParentHomeController controller;
+  final ValueChanged<BuildContext>? onSignOut;
 
   @override
   Widget build(BuildContext context) => Theme(
@@ -20,6 +22,12 @@ class ParentHomeShell extends StatelessWidget {
         child: ListenableBuilder(
           listenable: controller,
           builder: (context, _) {
+            if (controller.bottomNavIndex == 4) {
+              return ParentAccountView(
+                controller: controller,
+                onSignOut: onSignOut,
+              );
+            }
             if (controller.bottomNavIndex != 0) {
               return _PlaceholderTab(
                 label: _tabLabel(controller.bottomNavIndex),

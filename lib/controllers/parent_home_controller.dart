@@ -3,24 +3,107 @@ import 'package:flutter/foundation.dart';
 import '../models/parent_models.dart';
 
 class ParentHomeController extends ChangeNotifier {
-  ParentHomeController({this.isNewParent = false});
+  ParentHomeController({this.isNewParent = false, ParentProfile? profile})
+    : profile =
+          profile ??
+          const ParentProfile(
+            name: 'Nadeesha Perera',
+            phone: '+94 77 123 4567',
+            email: 'nadeesha.perera@example.com',
+          );
 
-  final bool isNewParent;
+  ParentProfile profile;
+  bool darkMode = false;
+  bool pushNotifications = true;
+  bool emailNotifications = true;
+  int _nextChildId = 3;
+
+  void updateProfile(ParentProfile value) {
+    profile = value;
+    notifyListeners();
+  }
+
+  void setDarkMode(bool value) {
+    darkMode = value;
+    notifyListeners();
+  }
+
+  void setNotifications({bool? push, bool? email}) {
+    pushNotifications = push ?? pushNotifications;
+    emailNotifications = email ?? emailNotifications;
+    notifyListeners();
+  }
+
+  Child childById(String id) => children.firstWhere((child) => child.id == id);
+
+  void saveChild(Child child, {bool isNew = false}) {
+    if (isNew) {
+      children.add(
+        Child(
+          id: 'local-${_nextChildId++}',
+          name: child.name,
+          school: child.school,
+          grade: child.grade,
+          className: child.className,
+          dateOfBirth: child.dateOfBirth,
+          address: child.address,
+        ),
+      );
+    } else {
+      final index = children.indexWhere((value) => value.id == child.id);
+      if (index == -1) return;
+      children[index] = child;
+    }
+    notifyListeners();
+  }
+
+  void addPickupPerson(String childId, PickupPerson person) {
+    final child = childById(childId);
+    saveChild(child.copyWith(pickupPeople: [...child.pickupPeople, person]));
+  }
+
+  bool isNewParent;
+
+  void setHomeVariant(bool value) {
+    isNewParent = value;
+    notifyListeners();
+  }
 
   int selectedChildIndex = 0;
   int bottomNavIndex = 0;
 
-  final List<Child> children = const [
+  final List<Child> children = [
     Child(
       id: '1',
-      name: 'Sanulli',
-      school: 'Royal International School',
-      grade: 'Grade 4',
+      name: 'Sanuli Perera',
+      school: 'Visakha Vidyalaya',
+      grade: 'Grade 5',
+      className: 'B',
+      dateOfBirth: DateTime(2016, 3, 14),
+      address: '42 Lake Drive, Rajagiriya',
+      allergies: 'Peanuts (severe)',
+      medicalNotes: 'Mild asthma \u00b7 inhaler in bag',
+      emergencyContact: 'Sunil Perera \u00b7 +94 71 987 6543',
+      pickupPeople: const [
+        PickupPerson(
+          name: 'Nadeesha Perera',
+          relationship: 'Mother \u00b7 you',
+        ),
+        PickupPerson(name: 'Sunil Perera', relationship: 'Father'),
+        PickupPerson(
+          name: 'Kamala Dissanayake',
+          relationship: 'Grandmother',
+          needsPin: true,
+        ),
+      ],
       hasTransport: true,
     ),
     Child(
       id: '2',
-      name: 'Kavini',
+      name: 'Kavin Perera',
+      className: 'A',
+      dateOfBirth: DateTime(2019, 7, 8),
+      address: '42 Lake Drive, Rajagiriya',
       school: 'Royal International School',
       grade: 'Grade 2',
       hasTransport: true,
